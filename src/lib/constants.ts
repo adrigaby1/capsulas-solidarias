@@ -3,7 +3,11 @@ export const SITE = {
   tagline: "Una imagen única. Una donación real. Miles de vidas ayudadas.",
   description:
     "Dona desde 1 € para ayudar a las víctimas del terremoto en Venezuela y recibe, como agradecimiento, tu propia cápsula Gashapon coleccionable generada con IA.",
-  url: "https://capsulassolidarias.org",
+  // Se toma de NEXT_PUBLIC_SITE_URL (configurada en Vercel) para que los
+  // enlaces de compartir y la vista previa (Open Graph/WhatsApp) siempre
+  // apunten al dominio real desplegado, sin tener que tocar este archivo
+  // cada vez que cambie.
+  url: process.env.NEXT_PUBLIC_SITE_URL || "https://capsulassolidarias.org",
   twitter: "@capsulasIA",
   supportEmail: "hola@capsulassolidarias.org",
 } as const;

@@ -93,6 +93,10 @@ export function PersonalizationForm({ sessionId }: { sessionId: string | null })
     setSubmitting(true);
     setSubmitError(null);
 
+    // Depuración temporal: confirma en la consola del navegador qué valores
+    // tienen realmente las casillas justo antes de enviarse.
+    console.log("[PersonalizationForm] Enviando formulario. terremotoTheme=", data.terremotoTheme, "galleryConsent=", data.galleryConsent);
+
     try {
       const formData = new FormData();
       formData.append("photo", photo);
