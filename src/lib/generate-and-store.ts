@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import { getSupabaseServiceClient, RESULTS_BUCKET } from "@/lib/supabase/server";
 import { buildCapsulePrompt } from "@/lib/prompt-builder";
 import { generateCapsuleImage } from "@/lib/image-generation";
+import { normalizeReferenceImage } from "@/lib/normalize-image";
 import type { CapsuleFormData } from "@/lib/types";
 
 /**
@@ -36,11 +37,22 @@ export async function runImageGeneration(submissionId: string) {
     if (!photoResponse.ok) {
       throw new Error("No se ha podido descargar la fotografía original.");
     }
-    const referenceImage = await photoResponse.blob();
+    const rawBuffer = Buffer.from(await photoResponse.arrayBuffer());
+
+    // Normalizamos siempre a un PNG "limpio" (sRGB, sin alfa, orientado)
+    // antes de mandarlo a OpenAI: algunas fotos de iPhone (HEIC reales o con
+    // perfiles de color no estándar) provocan un error invalid_image_file
+    // si se envían tal cual.
+    const normalized = await normalizeReferenceImage(
+      rawBuffer,
+      photoResponse.headers.get("content-type") ?? undefined
+    );
+    const referenceImage = new Blob([normalized.buffer], { type: normalized.contentType });
 
     const { imageBuffer, contentType } = await generateCapsuleImage({
       prompt,
       referenceImage,
+      referenceImageName: normalized.filename,
     });
 
     const resultPath = `${submissionId}/${uuidv4()}.png`;
