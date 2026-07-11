@@ -29,12 +29,16 @@ create table if not exists public.submissions (
   prompt text,
   error_message text,
   gallery_consent boolean not null default false,
+  terremoto_theme boolean not null default false,
+  show_donation_amount boolean not null default false,
   created_at timestamptz not null default now()
 );
 
--- Migración: si la tabla ya existía de antes (sin esta columna), esto la
+-- Migración: si la tabla ya existía de antes (sin estas columnas), esto las
 -- añade sin tocar los datos existentes. Seguro de ejecutar varias veces.
 alter table public.submissions add column if not exists gallery_consent boolean not null default false;
+alter table public.submissions add column if not exists terremoto_theme boolean not null default false;
+alter table public.submissions add column if not exists show_donation_amount boolean not null default false;
 
 create index if not exists submissions_donation_id_idx on public.submissions (donation_id);
 create index if not exists submissions_status_idx on public.submissions (status);

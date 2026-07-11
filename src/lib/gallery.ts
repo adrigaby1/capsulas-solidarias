@@ -23,7 +23,7 @@ export async function getGalleryItems(limit = 60): Promise<GalleryItem[]> {
     const supabase = getSupabaseServiceClient();
     const { data, error } = await supabase
       .from("submissions")
-      .select("id, image_url, form_data, created_at, donations(amount_cents)")
+      .select("id, image_url, form_data, created_at, show_donation_amount, donations(amount_cents)")
       .eq("status", "ready")
       .eq("gallery_consent", true)
       .order("created_at", { ascending: false })
@@ -52,7 +52,7 @@ export async function getGalleryItems(limit = 60): Promise<GalleryItem[]> {
           escenario: formData?.escenario ?? "",
           createdAt: row.created_at,
           donationAmountCents:
-            formData?.showDonationAmount && donation?.amount_cents != null
+            row.show_donation_amount && donation?.amount_cents != null
               ? donation.amount_cents
               : undefined,
         };

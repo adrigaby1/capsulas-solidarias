@@ -5,7 +5,7 @@ en Venezuela. Cada donante recibe, como agradecimiento, una cápsula Gashapon
 coleccionable generada con IA a partir de su fotografía.
 
 Stack: **Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · Stripe ·
-Supabase (Postgres + Storage) · OpenAI Images (gpt-image-1) · Vercel**.
+Supabase (Postgres + Storage) · OpenAI Images (gpt-image-1.5) · Vercel**.
 
 ## Flujo del producto
 
@@ -37,7 +37,7 @@ Inicio → Historia → Destino de las donaciones → Donar (importe libre, desd
 - Node.js 20+
 - Una cuenta de [Stripe](https://stripe.com)
 - Un proyecto de [Supabase](https://supabase.com)
-- Una API key de [OpenAI](https://platform.openai.com) con acceso al modelo `gpt-image-1`
+- Una API key de [OpenAI](https://platform.openai.com) con acceso al modelo `gpt-image-1.5`
   (o adapta `src/lib/image-generation.ts` para usar otro proveedor)
 
 ## 2. Instalación local
@@ -94,9 +94,12 @@ extremadamente lenta (minutos en vez de segundos).
    solo tienes que reimplementar `generateCapsuleImage` en
    `src/lib/image-generation.ts` — el resto de la aplicación no cambia.
 
-Coste orientativo: cada cápsula generada con `gpt-image-1` en calidad alta
-cuesta aproximadamente 0,15-0,20 $. Ajusta tu límite de facturación acorde
-al volumen de donaciones esperado.
+Coste orientativo: con `gpt-image-1` en calidad alta, cada cápsula costaba
+aproximadamente 0,15-0,20 $ (ese modelo se retira el 23 de octubre de 2026).
+Ahora se usa `gpt-image-1.5`, su sucesor directo (mismo endpoint y parámetros);
+revisa el coste real de las primeras cápsulas generadas con él en tu panel de
+OpenAI (Settings > Usage) para ajustar tu límite de facturación al volumen de
+donaciones esperado.
 
 ## 4. Despliegue en Vercel
 

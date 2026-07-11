@@ -38,7 +38,9 @@ export async function generateCapsuleImage({
   }
 
   const form = new FormData();
-  form.append("model", "gpt-image-1");
+  // gpt-image-1 se retira el 23 de octubre de 2026; usamos ya su sucesor.
+  // Mismo endpoint y parámetros (size, quality), solo cambia el modelo.
+  form.append("model", "gpt-image-1.5");
   form.append("prompt", prompt);
   form.append("size", "1024x1024");
   form.append("quality", "high");

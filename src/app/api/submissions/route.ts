@@ -100,6 +100,7 @@ export async function POST(request: NextRequest) {
   console.log("[submissions] Recibido del formulario:", {
     terremotoTheme: parsed.data.terremotoTheme,
     galleryConsent: parsed.data.galleryConsent,
+    showDonationAmount: parsed.data.showDonationAmount,
   });
 
   const { error: insertError } = await supabase.from("submissions").insert({
@@ -109,6 +110,8 @@ export async function POST(request: NextRequest) {
     form_data: parsed.data,
     status: "pending",
     gallery_consent: Boolean(parsed.data.galleryConsent),
+    terremoto_theme: Boolean(parsed.data.terremotoTheme),
+    show_donation_amount: Boolean(parsed.data.showDonationAmount),
   });
 
   if (insertError) {
