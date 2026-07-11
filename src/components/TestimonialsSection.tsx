@@ -3,14 +3,14 @@ import { InstagramEmbed } from "@/components/InstagramEmbed";
 
 const REELS = [
   {
-    url: "https://www.instagram.com/reel/DaAWWiuNqHt/",
-    author: "@jeremiasloscher",
-    description: "Un reportaje documental sobre la magnitud de lo ocurrido en Venezuela.",
-  },
-  {
     url: "https://www.instagram.com/reel/DaXB9IpSNmM/",
     author: "@yulburkle",
     description: "Un relato de la situación vivida tras el terremoto.",
+  },
+  {
+    url: "https://www.instagram.com/reel/DaAWWiuNqHt/",
+    author: "@jeremiasloscher",
+    description: "Un reportaje documental sobre la magnitud de lo ocurrido en Venezuela.",
   },
 ];
 

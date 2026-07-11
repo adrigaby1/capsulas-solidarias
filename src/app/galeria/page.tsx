@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
+import { GalleryGrid } from "@/components/GalleryGrid";
 import { getGalleryItems } from "@/lib/gallery";
-import { formatEuros } from "@/lib/utils";
 import { Heart } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -46,37 +44,7 @@ export default async function GaleriaPage() {
             </Button>
           </div>
         ) : (
-          <div className="mt-14 grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4">
-            {items.map((item) => (
-              <Link
-                key={item.id}
-                href={`/capsula/${item.id}`}
-                className="group overflow-hidden rounded-2xl border border-ink/8 bg-white/50 transition-shadow hover:shadow-xl hover:shadow-ink/10"
-              >
-                <div className="aspect-square overflow-hidden">
-                  <Image
-                    src={item.imageUrl}
-                    alt={`Cápsula solidaria de ${item.nombre}`}
-                    width={400}
-                    height={400}
-                    unoptimized
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                </div>
-                <div className="p-3">
-                  <p className="truncate text-sm font-medium text-ink">
-                    {item.nombre}
-                    {item.donationAmountCents != null && (
-                      <span className="text-coral-dark"> · Donó {formatEuros(item.donationAmountCents)}</span>
-                    )}
-                  </p>
-                  {item.escenario && (
-                    <p className="truncate text-xs text-ink-soft">{item.escenario}</p>
-                  )}
-                </div>
-              </Link>
-            ))}
-          </div>
+          <GalleryGrid items={items} />
         )}
 
         <div className="mt-16 text-center">

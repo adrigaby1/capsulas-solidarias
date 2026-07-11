@@ -18,8 +18,14 @@ export async function ImpactSection() {
           </h2>
           <p className="mt-5 max-w-md leading-relaxed text-cream/70">
             {IMPACT_PARTNER.description} Trabajamos con{" "}
-            <span className="text-cream">{IMPACT_PARTNER.name}</span> para
-            garantizar que la ayuda llega a quien la necesita.
+            {VERIFIED_PARTNERS.map((partner, index) => (
+              <span key={partner.name}>
+                <span className="text-cream">{partner.name}</span>
+                {index < VERIFIED_PARTNERS.length - 2 && ", "}
+                {index === VERIFIED_PARTNERS.length - 2 && " y "}
+              </span>
+            ))}{" "}
+            para garantizar que la ayuda llega a quien la necesita.
           </p>
 
           <div className="mt-10 grid grid-cols-2 gap-6">
