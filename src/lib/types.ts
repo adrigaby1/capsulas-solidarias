@@ -45,6 +45,7 @@ export interface CapsuleFormData {
   // Preferencias de campaña
   terremotoTheme?: boolean;
   galleryConsent?: boolean;
+  showDonationAmount?: boolean;
 }
 
 export interface Submission {

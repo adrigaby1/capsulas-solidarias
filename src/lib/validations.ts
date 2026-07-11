@@ -39,6 +39,7 @@ export const capsuleFormSchema = z.object({
 
   terremotoTheme: z.boolean().optional(),
   galleryConsent: z.boolean().optional(),
+  showDonationAmount: z.boolean().optional(),
 });
 
 export type CapsuleFormInput = z.infer<typeof capsuleFormSchema>;

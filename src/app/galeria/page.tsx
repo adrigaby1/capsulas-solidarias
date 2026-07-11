@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { getGalleryItems } from "@/lib/gallery";
+import { formatEuros } from "@/lib/utils";
 import { Heart } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -63,7 +64,12 @@ export default async function GaleriaPage() {
                   />
                 </div>
                 <div className="p-3">
-                  <p className="truncate text-sm font-medium text-ink">{item.nombre}</p>
+                  <p className="truncate text-sm font-medium text-ink">
+                    {item.nombre}
+                    {item.donationAmountCents != null && (
+                      <span className="text-coral-dark"> · Donó {formatEuros(item.donationAmountCents)}</span>
+                    )}
+                  </p>
                   {item.escenario && (
                     <p className="truncate text-xs text-ink-soft">{item.escenario}</p>
                   )}

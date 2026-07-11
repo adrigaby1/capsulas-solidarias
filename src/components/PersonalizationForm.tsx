@@ -34,6 +34,7 @@ export function PersonalizationForm({ sessionId }: { sessionId: string | null })
   // más directa y fiable de leer "qué hay marcado ahora mismo".
   const [terremotoTheme, setTerremotoTheme] = useState(false);
   const [galleryConsent, setGalleryConsent] = useState(false);
+  const [showDonationAmount, setShowDonationAmount] = useState(false);
 
   const {
     register,
@@ -95,11 +96,16 @@ export function PersonalizationForm({ sessionId }: { sessionId: string | null })
     setSubmitting(true);
     setSubmitError(null);
 
-    const payload: CapsuleFormInput = { ...data, terremotoTheme, galleryConsent };
+    const payload: CapsuleFormInput = {
+      ...data,
+      terremotoTheme,
+      galleryConsent,
+      showDonationAmount: galleryConsent && showDonationAmount,
+    };
 
     // Depuración temporal: confirma en la consola del navegador qué valores
     // tienen realmente las casillas justo antes de enviarse.
-    console.log("[PersonalizationForm] Enviando formulario. terremotoTheme=", payload.terremotoTheme, "galleryConsent=", payload.galleryConsent);
+    console.log("[PersonalizationForm] Enviando formulario. terremotoTheme=", payload.terremotoTheme, "galleryConsent=", payload.galleryConsent, "showDonationAmount=", payload.showDonationAmount);
 
     try {
       const formData = new FormData();
@@ -277,10 +283,21 @@ export function PersonalizationForm({ sessionId }: { sessionId: string | null })
               />
               <Checkbox
                 checked={galleryConsent}
-                onChange={(e) => setGalleryConsent(e.target.checked)}
+                onChange={(e) => {
+                  setGalleryConsent(e.target.checked);
+                  if (!e.target.checked) setShowDonationAmount(false);
+                }}
                 label="Quiero que mi cápsula pueda aparecer en la galería pública de la web"
                 description="Ayuda a inspirar a más personas a donar. Puedes decir que no y tu cápsula seguirá siendo solo tuya."
               />
+              {galleryConsent && (
+                <Checkbox
+                  checked={showDonationAmount}
+                  onChange={(e) => setShowDonationAmount(e.target.checked)}
+                  label="Mostrar también cuánto he donado junto a mi cápsula en la galería"
+                  description="Aparecerá, por ejemplo, «Ana · Donó 10 €» debajo de tu cápsula. Si lo dejas sin marcar, solo se verán tu nombre y el escenario."
+                />
+              )}
             </div>
           </div>
         )}
