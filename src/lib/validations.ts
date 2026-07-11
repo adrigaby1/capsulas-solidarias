@@ -46,3 +46,10 @@ export type CapsuleFormInput = z.infer<typeof capsuleFormSchema>;
 
 export const MAX_PHOTO_SIZE_MB = 10;
 export const ACCEPTED_PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic"];
+
+// Vercel rechaza a nivel de plataforma (antes de que nuestro código llegue a
+// ejecutarse) cualquier petición a una Serverless Function con un cuerpo de
+// más de ~4,5 MB. Como el formulario va como multipart/form-data junto al
+// resto de campos, dejamos un margen de seguridad claro por debajo de ese
+// límite para el archivo ya comprimido que se sube de verdad.
+export const MAX_UPLOAD_SIZE_MB = 4;
