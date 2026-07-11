@@ -47,7 +47,12 @@ export async function runImageGeneration(submissionId: string) {
       rawBuffer,
       photoResponse.headers.get("content-type") ?? undefined
     );
-    const referenceImage = new Blob([normalized.buffer], { type: normalized.contentType });
+    // Uint8Array.from() copia a un ArrayBuffer "normal" (no
+    // ArrayBufferLike/SharedArrayBuffer), que es el tipo que exige BlobPart
+    // en TypeScript — Buffer no es directamente asignable ahí.
+    const referenceImage = new Blob([Uint8Array.from(normalized.buffer)], {
+      type: normalized.contentType,
+    });
 
     const { imageBuffer, contentType } = await generateCapsuleImage({
       prompt,
