@@ -27,6 +27,7 @@ export function CapsuleResult({ submissionId }: { submissionId: string }) {
   const [state, setState] = useState<SubmissionState>({ status: "pending", image_url: null });
   const [messageIndex, setMessageIndex] = useState(0);
   const [retrying, setRetrying] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -87,6 +88,34 @@ export function CapsuleResult({ submissionId }: { submissionId: string }) {
     } finally {
       await refreshStatus();
       setRetrying(false);
+    }
+  }
+
+  async function handleDownload() {
+    if (!state.image_url || downloading) return;
+    setDownloading(true);
+    try {
+      // La imagen vive en Supabase Storage (otro dominio), y el atributo
+      // download de <a> no funciona en enlaces cross-origin: el navegador
+      // simplemente abre la imagen en vez de descargarla. Para forzar la
+      // descarga real, la traemos como blob y creamos un enlace temporal
+      // a una URL local (blob:), que sí respeta "download".
+      const res = await fetch(state.image_url);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = "mi-capsula-solidaria.png";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(blobUrl);
+    } catch {
+      // Si algo falla (red, CORS…), al menos abrimos la imagen para que
+      // el usuario pueda guardarla manualmente con clic derecho.
+      window.open(state.image_url, "_blank");
+    } finally {
+      setDownloading(false);
     }
   }
 
@@ -151,13 +180,19 @@ export function CapsuleResult({ submissionId }: { submissionId: string }) {
 
       <div className="flex flex-wrap items-center justify-center gap-4">
         {state.image_url && (
-          <a
-            href={state.image_url}
-            download="mi-capsula-solidaria.png"
-            className="inline-flex items-center gap-2 rounded-full bg-coral px-6 py-3 text-sm font-medium text-white hover:bg-coral-dark"
+          <button
+            type="button"
+            onClick={handleDownload}
+            disabled={downloading}
+            className="inline-flex items-center gap-2 rounded-full bg-coral px-6 py-3 text-sm font-medium text-white hover:bg-coral-dark disabled:opacity-60"
           >
-            <Download className="h-4 w-4" /> Descargar mi cápsula
-          </a>
+            {downloading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="h-4 w-4" />
+            )}
+            {downloading ? "Descargando…" : "Descargar mi cápsula"}
+          </button>
         )}
       </div>
 
