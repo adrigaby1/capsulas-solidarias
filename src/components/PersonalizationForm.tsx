@@ -267,20 +267,6 @@ export function PersonalizationForm({ sessionId }: { sessionId: string | null })
                 <textarea {...register("motivo")} rows={2} className={inputClass} />
               </Field>
             </div>
-          </div>
-        )}
-
-        {step === 4 && (
-          <div>
-            <h2 className="font-display text-2xl">Un último mensaje</h2>
-            <p className="mt-2 text-sm text-ink-soft">
-              ¿Hay algo que quieras que la escena transmita? (opcional)
-            </p>
-            <div className="mt-6">
-              <Field label="Mensaje o dedicatoria">
-                <textarea {...register("mensajeDedicatoria")} rows={4} className={inputClass} />
-              </Field>
-            </div>
 
             <div className="mt-6 space-y-4">
               <Checkbox
@@ -295,6 +281,20 @@ export function PersonalizationForm({ sessionId }: { sessionId: string | null })
                 label="Quiero que mi cápsula pueda aparecer en la galería pública de la web"
                 description="Ayuda a inspirar a más personas a donar. Puedes decir que no y tu cápsula seguirá siendo solo tuya."
               />
+            </div>
+          </div>
+        )}
+
+        {step === 4 && (
+          <div>
+            <h2 className="font-display text-2xl">Un último mensaje</h2>
+            <p className="mt-2 text-sm text-ink-soft">
+              ¿Hay algo que quieras que la escena transmita? (opcional)
+            </p>
+            <div className="mt-6">
+              <Field label="Mensaje o dedicatoria">
+                <textarea {...register("mensajeDedicatoria")} rows={4} className={inputClass} />
+              </Field>
             </div>
 
             {submitError && (
