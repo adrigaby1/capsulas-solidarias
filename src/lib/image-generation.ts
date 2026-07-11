@@ -54,6 +54,24 @@ export async function generateCapsuleImage({
 
   if (!response.ok) {
     const errorBody = await response.text();
+    // Guardamos el detalle técnico completo en los logs del servidor (para
+    // depurar), pero al usuario le mostramos un mensaje claro y accionable
+    // en vez del JSON crudo de OpenAI.
+    console.error(`[image-generation] Error de OpenAI (${response.status}):`, errorBody);
+
+    let code: string | undefined;
+    try {
+      code = (JSON.parse(errorBody)?.error?.code as string | undefined) ?? undefined;
+    } catch {
+      // el cuerpo no era JSON válido, seguimos con el mensaje genérico
+    }
+
+    if (code === "moderation_blocked") {
+      throw new Error(
+        "El sistema de seguridad de la IA ha bloqueado esta generación. Esto suele pasar por la fotografía subida (por ejemplo, fotos de menores sin un adulto, o imágenes de baja calidad/borrosas) o por algún texto del formulario. Prueba con otra fotografía o simplifica el mensaje/dedicatoria, y vuelve a intentarlo."
+      );
+    }
+
     throw new Error(`Error generando la imagen (${response.status}): ${errorBody}`);
   }
 
