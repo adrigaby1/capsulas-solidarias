@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { capsuleFormSchema, type CapsuleFormInput } from "@/lib/validations";
 import { SCENARIO_OPTIONS } from "@/lib/constants";
@@ -27,20 +27,22 @@ export function PersonalizationForm({ sessionId }: { sessionId: string | null })
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  // Estos dos campos se manejan con estado normal de React, fuera de
+  // react-hook-form: con Controller/register se detectó que el valor
+  // marcado en el checkbox no siempre llegaba al envío (posible conflicto
+  // con la revalidación de zodResolver). Un useState simple es la forma
+  // más directa y fiable de leer "qué hay marcado ahora mismo".
+  const [terremotoTheme, setTerremotoTheme] = useState(false);
+  const [galleryConsent, setGalleryConsent] = useState(false);
 
   const {
     register,
-    control,
     trigger,
     handleSubmit,
     formState: { errors },
   } = useForm<CapsuleFormInput>({
     resolver: zodResolver(capsuleFormSchema),
     mode: "onBlur",
-    defaultValues: {
-      terremotoTheme: false,
-      galleryConsent: false,
-    },
   });
 
   const isLastStep = step === STEP_LABELS.length - 1;
@@ -93,15 +95,17 @@ export function PersonalizationForm({ sessionId }: { sessionId: string | null })
     setSubmitting(true);
     setSubmitError(null);
 
+    const payload: CapsuleFormInput = { ...data, terremotoTheme, galleryConsent };
+
     // Depuración temporal: confirma en la consola del navegador qué valores
     // tienen realmente las casillas justo antes de enviarse.
-    console.log("[PersonalizationForm] Enviando formulario. terremotoTheme=", data.terremotoTheme, "galleryConsent=", data.galleryConsent);
+    console.log("[PersonalizationForm] Enviando formulario. terremotoTheme=", payload.terremotoTheme, "galleryConsent=", payload.galleryConsent);
 
     try {
       const formData = new FormData();
       formData.append("photo", photo);
       formData.append("sessionId", sessionId ?? "");
-      formData.append("data", JSON.stringify(data));
+      formData.append("data", JSON.stringify(payload));
 
       const res = await fetch("/api/submissions", {
         method: "POST",
@@ -279,35 +283,17 @@ export function PersonalizationForm({ sessionId }: { sessionId: string | null })
             </div>
 
             <div className="mt-6 space-y-4">
-              <Controller
-                name="terremotoTheme"
-                control={control}
-                render={({ field: { value, onChange, onBlur, name, ref } }) => (
-                  <Checkbox
-                    ref={ref}
-                    name={name}
-                    checked={value ?? false}
-                    onChange={(e) => onChange(e.target.checked)}
-                    onBlur={onBlur}
-                    label="Quiero que mi cápsula incluya un guiño solidario al terremoto de Venezuela"
-                    description="Añadiremos un pequeño detalle visual (bandera, cinta o corazón solidario) en la escena, además de tu historia personal."
-                  />
-                )}
+              <Checkbox
+                checked={terremotoTheme}
+                onChange={(e) => setTerremotoTheme(e.target.checked)}
+                label="Quiero que mi cápsula incluya un guiño solidario al terremoto de Venezuela"
+                description="Añadiremos un pequeño detalle visual (bandera, cinta o corazón solidario) en la escena, además de tu historia personal."
               />
-              <Controller
-                name="galleryConsent"
-                control={control}
-                render={({ field: { value, onChange, onBlur, name, ref } }) => (
-                  <Checkbox
-                    ref={ref}
-                    name={name}
-                    checked={value ?? false}
-                    onChange={(e) => onChange(e.target.checked)}
-                    onBlur={onBlur}
-                    label="Quiero que mi cápsula pueda aparecer en la galería pública de la web"
-                    description="Ayuda a inspirar a más personas a donar. Puedes decir que no y tu cápsula seguirá siendo solo tuya."
-                  />
-                )}
+              <Checkbox
+                checked={galleryConsent}
+                onChange={(e) => setGalleryConsent(e.target.checked)}
+                label="Quiero que mi cápsula pueda aparecer en la galería pública de la web"
+                description="Ayuda a inspirar a más personas a donar. Puedes decir que no y tu cápsula seguirá siendo solo tuya."
               />
             </div>
 
