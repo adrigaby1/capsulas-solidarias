@@ -38,7 +38,7 @@ export const VERIFIED_PARTNERS = [
     role: "Atención médica de emergencia",
     description:
       "Atención médica y primeros auxilios sobre el terreno en las zonas declaradas en emergencia tras el terremoto.",
-    url: "https://example.org",
+    url: "https://www2.cruzroja.es/-/ayuda-terremoto-venezuela-2026",
   },
   {
     name: "Yummy",
