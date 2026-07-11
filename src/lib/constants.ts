@@ -28,6 +28,27 @@ export const IMPACT_PARTNER = {
   url: "https://example.org",
 };
 
+// Organizaciones verificadas cuyo trabajo sobre el terreno respalda la
+// promesa de transparencia de la campaña. Se muestran en la sección
+// "Destino de las donaciones" para que la gente sepa que su ayuda se
+// canaliza a través de entidades que ya están demostrando impacto real.
+export const VERIFIED_PARTNERS = [
+  {
+    name: "Cruz Roja Venezolana",
+    role: "Atención médica de emergencia",
+    description:
+      "Atención médica y primeros auxilios sobre el terreno en las zonas declaradas en emergencia tras el terremoto.",
+    url: "https://example.org",
+  },
+  {
+    name: "Yummy",
+    role: "Logística y ayuda humanitaria",
+    description:
+      "La superapp venezolana puso su red logística al servicio de la emergencia: recaudó 1.128.734 $ de 20.800 personas y 14 empresas (igualando el 25% de cada donación hasta 100.000 $), financiando el traslado desde México de 150 rescatistas, 3.600 bolsas para el centro de acopio de La Esmeralda y equipos de ultrasonido ya en uso en La Guaira.",
+    url: "https://dona.yummyrides.com/",
+  },
+] as const;
+
 export const IMPACT_BREAKDOWN = [
   {
     title: "Ayuda de emergencia",

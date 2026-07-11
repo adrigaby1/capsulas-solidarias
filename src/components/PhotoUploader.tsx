@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Image from "next/image";
 import { ImagePlus, X } from "lucide-react";
 import { ACCEPTED_PHOTO_TYPES, MAX_PHOTO_SIZE_MB } from "@/lib/validations";
 
@@ -65,12 +64,14 @@ export function PhotoUploader({
       ) : (
         <div className="relative mx-auto w-48 overflow-hidden rounded-3xl border border-ink/10">
           {preview && (
-            <Image
+            // Nota: esto es una vista previa local (blob: URL) del archivo
+            // recién elegido, no una imagen remota — usamos <img> nativo en
+            // vez de next/image (que en algunos navegadores móviles no
+            // renderiza bien las URLs blob: aunque esté "unoptimized").
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
               src={preview}
               alt="Vista previa de tu fotografía"
-              width={300}
-              height={300}
-              unoptimized
               className="aspect-square w-full object-cover"
             />
           )}

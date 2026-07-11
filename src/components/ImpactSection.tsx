@@ -1,9 +1,9 @@
 import { Section, Eyebrow } from "@/components/ui/Section";
 import { Button } from "@/components/ui/Button";
-import { IMPACT_BREAKDOWN, IMPACT_PARTNER } from "@/lib/constants";
+import { IMPACT_BREAKDOWN, IMPACT_PARTNER, VERIFIED_PARTNERS } from "@/lib/constants";
 import { formatEuros } from "@/lib/utils";
 import { getImpactStats } from "@/lib/stats";
-import { ShieldCheck } from "lucide-react";
+import { ShieldCheck, ExternalLink } from "lucide-react";
 
 export async function ImpactSection() {
   const stats = await getImpactStats();
@@ -60,6 +60,39 @@ export async function ImpactSection() {
               </div>
               <p className="mt-2 text-sm text-cream/50">{item.detail}</p>
             </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-16 border-t border-cream/10 pt-12">
+        <Eyebrow>Organizaciones verificadas</Eyebrow>
+        <p className="mt-4 max-w-2xl text-sm text-cream/60">
+          No trabajamos solos. Estas son organizaciones cuyo trabajo sobre el
+          terreno ya está demostrando impacto real — para que sepas que tu
+          ayuda se canaliza a través de entidades que en verdad están
+          ayudando.
+        </p>
+
+        <div className="mt-8 grid gap-6 md:grid-cols-2">
+          {VERIFIED_PARTNERS.map((partner) => (
+            <a
+              key={partner.name}
+              href={partner.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group rounded-2xl border border-cream/10 bg-cream/5 p-6 transition-colors hover:border-cream/25 hover:bg-cream/10"
+            >
+              <div className="flex items-baseline justify-between gap-3">
+                <h3 className="font-display text-lg text-cream">{partner.name}</h3>
+                <ExternalLink className="h-4 w-4 shrink-0 text-cream/40 transition-colors group-hover:text-cream/70" />
+              </div>
+              <p className="mt-1 text-xs font-medium uppercase tracking-wide text-coral/80">
+                {partner.role}
+              </p>
+              <p className="mt-3 text-sm leading-relaxed text-cream/60">
+                {partner.description}
+              </p>
+            </a>
           ))}
         </div>
       </div>
