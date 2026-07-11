@@ -1,13 +1,17 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { runImageGeneration } from "@/lib/generate-and-store";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+export const maxDuration = 120;
 
 /**
  * Permite reintentar la generación de una cápsula (p. ej. si la primera
  * llamada falló por un error transitorio del proveedor de IA). Se llama
  * desde el botón "Reintentar" en /capsula/[id] cuando status === "error".
+ *
+ * Igual que en /api/submissions, la generación se lanza en segundo plano
+ * con after() en vez de bloquear la respuesta HTTP: el cliente vuelve a
+ * sondear el estado con el mismo mecanismo de poll que usa la primera vez.
  */
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
@@ -17,11 +21,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Falta submissionId." }, { status: 400 });
   }
 
-  try {
-    await runImageGeneration(submissionId);
-    return NextResponse.json({ ok: true });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Error desconocido.";
-    return NextResponse.json({ error: message }, { status: 500 });
-  }
+  after(() =>
+    runImageGeneration(submissionId).catch((error) => {
+      console.error("[generate-image] Error reintentando la generación:", error);
+    })
+  );
+
+  return NextResponse.json({ ok: true });
 }

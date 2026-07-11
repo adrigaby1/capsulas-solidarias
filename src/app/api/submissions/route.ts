@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { v4 as uuidv4 } from "uuid";
 import { getSupabaseServiceClient, STORAGE_BUCKET } from "@/lib/supabase/server";
 import { capsuleFormSchema } from "@/lib/validations";
@@ -6,7 +6,12 @@ import { stripe, isStripeConfigured } from "@/lib/stripe";
 import { runImageGeneration } from "@/lib/generate-and-store";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+// La generación de imagen (llamada a OpenAI) puede tardar bastante y se
+// lanza en segundo plano tras responder al cliente (ver after() más abajo)
+// en vez de bloquear la petición HTTP — le damos margen amplio dentro de
+// lo que permite Vercel (Fluid Compute soporta hasta 300s incluso en el
+// plan Hobby).
+export const maxDuration = 120;
 
 async function resolveDonationId(supabase: ReturnType<typeof getSupabaseServiceClient>, sessionId: string) {
   const { data } = await supabase
@@ -119,18 +124,24 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "No se ha podido guardar tu formulario." }, { status: 500 });
   }
 
-  // Generamos la imagen dentro del mismo request (adecuado para el tamaño
-  // de este proyecto; maxDuration=60 da margen suficiente). Si el volumen
-  // crece, esto debería moverse a una cola (QStash, Supabase Edge
-  // Functions o un worker dedicado) para no bloquear la respuesta HTTP.
-  try {
-    await runImageGeneration(submissionId);
-  } catch (error) {
-    // No devolvemos error al cliente: la submission queda marcada como
-    // "error" en la base de datos y la página de resultado permite
-    // reintentar la generación desde /api/generate-image.
-    console.error("[submissions] Error en la generación de imagen:", error);
-  }
+  // Lanzamos la generación en segundo plano con after(): así respondemos
+  // al cliente de inmediato (justo tras guardar la foto y la submission)
+  // en vez de tenerlo esperando hasta un minuto entero a que OpenAI
+  // termine. La función sigue viva en background hasta maxDuration para
+  // completar la generación; el cliente ya navega a /capsula/[id], que
+  // consulta el estado con sondeo (poll) cada 2,5s hasta que esté listo.
+  //
+  // Esto también hace la app más robusta con varios usuarios a la vez:
+  // ya no hay una petición HTTP colgada hasta un minuto por cada cápsula,
+  // solo la respuesta rápida + el trabajo en background.
+  after(() =>
+    runImageGeneration(submissionId).catch((error) => {
+      // No hay cliente esperando esta promesa: si falla, la submission
+      // queda marcada como "error" en la base de datos (dentro de
+      // runImageGeneration) y la página de resultado permite reintentar.
+      console.error("[submissions] Error en la generación de imagen:", error);
+    })
+  );
 
   return NextResponse.json({ submissionId });
 }

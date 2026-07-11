@@ -17,6 +17,13 @@ Inicio → Historia → Destino de las donaciones → Donar (importe libre, desd
 
 ## Novedades
 
+- **Generación en segundo plano**: `/api/submissions` y `/api/generate-image`
+  responden en cuanto guardan la foto/submission y lanzan la llamada a la
+  IA con `after()` (Next.js) en vez de esperarla — así la petición HTTP no
+  se queda colgada hasta que OpenAI termine. La página `/capsula/[id]`
+  (`CapsuleResult.tsx`) sondea el estado cada 2,5 s hasta que está listo.
+  Esto evita los `504 FUNCTION_INVOCATION_TIMEOUT` de Vercel y hace la app
+  más robusta con varios usuarios generando cápsulas a la vez.
 - **Prompt en lenguaje natural**: `src/lib/prompt-builder.ts` construye el
   prompt como frases (no listas de "Etiqueta: valor"), incorporando
   explícitamente cada campo que la persona haya rellenado.

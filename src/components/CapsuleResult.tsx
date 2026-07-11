@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Download, Loader2, RefreshCw, Sparkles } from "lucide-react";
 import { ShareButtons } from "@/components/ShareButtons";
@@ -36,58 +36,49 @@ export function CapsuleResult({ submissionId }: { submissionId: string }) {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    let cancelled = false;
+  const cancelledRef = useRef(false);
 
-    async function poll() {
-      try {
-        const res = await fetch(`/api/submissions/${submissionId}`);
-        const json = await res.json();
-        if (cancelled) return;
-
-        setState(json);
-
-        if (json.status === "pending" || json.status === "generating") {
-          setTimeout(poll, 2500);
-        }
-      } catch {
-        if (!cancelled) setTimeout(poll, 3000);
-      }
-    }
-
-    poll();
-    return () => {
-      cancelled = true;
-    };
-  }, [submissionId]);
-
-  async function refreshStatus() {
+  const poll = useCallback(async () => {
     try {
       const res = await fetch(`/api/submissions/${submissionId}`);
       const json = await res.json();
+      if (cancelledRef.current) return;
+
       setState(json);
+
+      if (json.status === "pending" || json.status === "generating") {
+        setTimeout(poll, 2500);
+      }
     } catch {
-      // si falla la comprobación, dejamos el estado de error visible
-      // para que el usuario pueda pulsar "Reintentar" de nuevo
+      if (!cancelledRef.current) setTimeout(poll, 3000);
     }
-  }
+  }, [submissionId]);
+
+  useEffect(() => {
+    cancelledRef.current = false;
+    poll();
+    return () => {
+      cancelledRef.current = true;
+    };
+  }, [poll]);
 
   async function handleRetry() {
     setRetrying(true);
     setState((s) => ({ ...s, status: "generating" }));
     try {
-      // Esta llamada espera a que termine toda la generación (puede
-      // tardar 1-3 minutos), así que al resolver ya sabemos el resultado
-      // final. Volvemos a consultar la submission para reflejarlo en la UI
-      // (tanto si ha ido bien como si ha vuelto a fallar).
+      // El servidor lanza la generación en segundo plano y responde de
+      // inmediato (ver after() en /api/generate-image); no esperamos aquí
+      // a que termine, retomamos el mismo sondeo (poll) que se usa la
+      // primera vez para reflejar el resultado en cuanto esté listo.
       await fetch("/api/generate-image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ submissionId }),
       });
     } finally {
-      await refreshStatus();
       setRetrying(false);
+      cancelledRef.current = false;
+      poll();
     }
   }
 
