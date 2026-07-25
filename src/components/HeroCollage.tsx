@@ -1,8 +1,5 @@
 import Image from "next/image";
 
-const SUPABASE_BASE =
-  "https://klutkfkrfwteanidyyrr.supabase.co/storage/v1/object/public/capsule-results";
-
 type CollageItem = {
   src: string;
   alt: string;
@@ -26,10 +23,10 @@ const ITEMS: CollageItem[] = [
     priority: true,
   },
   {
-    src: `${SUPABASE_BASE}/e4efdde8-775d-4c20-9767-afab7891505e/8f21d6ad-fd3b-4ed7-9201-680e6f73ded8.png`,
-    alt: "Cápsula solidaria real de Alicia, con un diorama de medicina",
-    caption: "Alicia · Donó 1 €",
-    detail: "Medicina",
+    src: "/capsulas/capsula-adriana.webp",
+    alt: "Cápsula solidaria real de Adriana, en un jardín con la bandera de Venezuela y un corazón",
+    caption: "Adriana",
+    detail: "Naturaleza",
     className: "left-[-2%] top-[-2%] z-20 w-[38%]",
     rotate: "-rotate-6",
     delay: "1.2s",
