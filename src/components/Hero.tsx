@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/Button";
-import { CapsuleIllustration } from "@/components/CapsuleIllustration";
+import { HeroCollage } from "@/components/HeroCollage";
 import { Container } from "@/components/ui/Container";
 
 export function Hero() {
@@ -44,8 +44,11 @@ export function Hero() {
           </p>
         </div>
 
-        <div className="relative mx-auto aspect-[4/4.6] w-full max-w-sm animate-float-slow">
-          <CapsuleIllustration accent="coral" />
+        <div className="relative">
+          <HeroCollage />
+          <p className="mt-4 text-center text-xs text-ink-soft/80">
+            Resultados reales de personas que ya han donado.
+          </p>
         </div>
       </Container>
     </section>
